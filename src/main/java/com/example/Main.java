@@ -79,6 +79,7 @@ public class Main {
             case 3 -> countMissionByYear(connection, sc);
             case 4 -> createAccount(connection, sc);
             case 5 -> updateAccount(connection, sc);
+            case 6 -> deleteAccount(connection, sc);
             case 0 -> System.out.println("Exiting...");
             default -> System.out.println("Invalid choice, try again");
 
@@ -198,6 +199,25 @@ public class Main {
                 System.out.println("No account found with that user_id.");
             }
         }
+    }
+
+    public void deleteAccount(Connection connection, Scanner sc) throws SQLException {
+        System.out.println("Enter user_id: ");
+        String user_id = sc.next();
+
+        String sql = "DELETE FROM account WHERE user_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, user_id);
+
+            int rowsDeleted = stmt.executeUpdate();
+
+            if (rowsDeleted > 0) {
+                System.out.println("Account Deleted.");
+            } else {
+                System.out.println("No account found with that user_id.");
+            }
+        }
+
     }
 
     /**

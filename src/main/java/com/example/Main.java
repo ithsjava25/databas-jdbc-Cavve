@@ -19,6 +19,7 @@ public class Main {
         String dbUser = resolveConfig("APP_DB_USER", "APP_DB_USER");
         String dbPass = resolveConfig("APP_DB_PASS", "APP_DB_PASS");
 
+
         if (jdbcUrl == null || dbUser == null || dbPass == null) {
             throw new IllegalStateException(
                     "Missing DB configuration. Provide APP_JDBC_URL, APP_DB_USER, APP_DB_PASS " +
@@ -75,12 +76,14 @@ public class Main {
             switch (choice) {
             case 1 -> listSpacecrafts(connection);
             case 2 -> moonMission(connection, sc);
+            case 3 -> countMissionByYear(connection, sc);
+            case 4 -> createAccount(connection, sc);
+            case 5 -> updateAccount(connection, sc);
             case 0 -> System.out.println("Exiting...");
             default -> System.out.println("Invalid choice, try again");
 
             }
        }
-
 
         //Todo: Starting point for your code
         // showMenu(sc, connection)
@@ -104,18 +107,95 @@ public class Main {
     public void moonMission(Connection connection, Scanner sc) throws SQLException {
         System.out.println("Enter Mission ID: ");
         int id = sc.nextInt();
+        System.out.println("Mission ID: " + id);
 
-        String sql = "SELECT mission_id FROM moon_mission";
+        String sql = "SELECT * FROM moon_mission WHERE mission_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
              stmt.setInt(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     System.out.println("Spacecraft: " + rs.getString("spacecraft"));
-                    System.out.println("Launch Year: " + rs.getInt("launch_year"));
+                    System.out.println("Launch Date: " + rs.getDate("launch_date"));
+                    System.out.println("Carrier: " + rs.getString("carrier_rocket"));
+                    System.out.println("Operator: " + rs.getString("Operator"));
+                    System.out.println("Mission Type: " + rs.getString("mission_type"));
+                    System.out.println("Outcome: " + rs.getString("outcome"));
                 } else {
                     System.out.println("No mission found with that ID.");
                 }
+            }
+        }
+    }
+
+    public void countMissionByYear(Connection connection, Scanner sc) throws SQLException {
+        System.out.println("Enter year: ");
+        int year = sc.nextInt();
+        System.out.println("Year: " + year);
+
+        String sql = "SELECT count(*) FROM moon_mission WHERE YEAR(launch_date) = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, year);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+
+                    if (count == 0) {
+                        System.out.println("No missions launched that year.");
+                    } else {
+                        System.out.println("Number of missions that launched that year: " + count);
+                    }
+                }
+            }
+        }
+    }
+
+    public void createAccount(Connection connection, Scanner sc) throws SQLException {
+        System.out.println("Enter First name: ");
+        String first_name = sc.next();
+        System.out.println("Enter Last name: ");
+        String last_name = sc.next();
+        System.out.println("Enter ssn: ");
+        String ssn = sc.next();
+        System.out.println("Enter password: ");
+        String password = sc.next();
+
+
+        String sql = "INSERT INTO account (first_name, last_name, ssn, password) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, first_name);
+            stmt.setString(2, last_name);
+            stmt.setString(3, ssn);
+            stmt.setString(4, password);
+            stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                int id = rs.getInt(1);
+                System.out.println("Created an account with ID: " + id);
+            }
+        }
+    }
+
+    public void updateAccount(Connection connection, Scanner sc) throws SQLException {
+        System.out.println("Enter user_id: ");
+        String user_id = sc.next();
+        System.out.println("Enter new password: ");
+        String password = sc.next();
+
+
+        String sql = "UPDATE account SET password = ? WHERE user_id = ?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setString(1, password);
+            stmt.setString(2, user_id);
+
+            int rowsUpdated = stmt.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                System.out.println("Password updated.");
+            } else {
+                System.out.println("No account found with that user_id.");
             }
         }
     }
@@ -149,8 +229,8 @@ public class Main {
 }
 
 
-
-
+//780112-1350
+//MB=V4cbAqPz4vqmQ
 //nytt resultset varje gång för varje test
 //behöver inte nytt objekt varje gång men = statement.executeQuery behövs
 //kan återanvända connection och statement

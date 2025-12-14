@@ -36,7 +36,6 @@ public class Main {
             System.out.println("Password: ");
             String password = sc.nextLine();
 
-            boolean valid = false;
 
             String sql = "SELECT * FROM account WHERE name = ? AND password = ?";
             try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -86,8 +85,6 @@ public class Main {
             }
        }
 
-        //Todo: Starting point for your code
-        // showMenu(sc, connection)
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

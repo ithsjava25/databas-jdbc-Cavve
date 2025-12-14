@@ -45,7 +45,10 @@ java -DdevMode=true -jar target/app.jar
 
 ### Supplying your own database settings in IntelliJ (when not using dev mode)
 
-If you prefer to connect to an existing database (local or remote) and you are not using dev mode, configure the Run/Debug Configuration in IntelliJ IDEA. The application reads settings with clear precedence: Java system properties (VM options) first, then environment variables.
+If you prefer to connect to an existing database (local or remote) and you are not using dev mode, 
+configure the Run/Debug Configuration in IntelliJ IDEA. 
+The application reads settings with clear precedence: Java system properties (VM options) first, 
+then environment variables.
 
 Required keys:
 - `APP_JDBC_URL`  (e.g., `jdbc:mysql://localhost:3306/testdb`)

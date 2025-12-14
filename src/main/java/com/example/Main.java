@@ -116,7 +116,7 @@ public class Main {
                     System.out.println("Spacecraft: " + rs.getString("spacecraft"));
                     System.out.println("Launch Date: " + rs.getDate("launch_date"));
                     System.out.println("Carrier: " + rs.getString("carrier_rocket"));
-                    System.out.println("Operator: " + rs.getString("Operator"));
+                    System.out.println("Operator: " + rs.getString("operator"));
                     System.out.println("Mission Type: " + rs.getString("mission_type"));
                     System.out.println("Outcome: " + rs.getString("outcome"));
                 } else {
@@ -159,19 +159,24 @@ public class Main {
         System.out.println("Enter password: ");
         String password = sc.next();
 
+        //Compute username
+        String name =  first_name.substring(0, Math.min(3, first_name.length())) +
+                last_name.substring(0, Math.min(3, last_name.length()));
 
-        String sql = "INSERT INTO account (first_name, last_name, ssn, password) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO account (name, first_name, last_name, ssn, password) VALUES (?, ?, ?, ?)";
+
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, first_name);
-            stmt.setString(2, last_name);
-            stmt.setString(3, ssn);
-            stmt.setString(4, password);
+            stmt.setString(1, name);
+            stmt.setString(2, first_name);
+            stmt.setString(3, last_name);
+            stmt.setString(4, ssn);
+            stmt.setString(5, password);
             stmt.executeUpdate();
 
             ResultSet rs = stmt.getGeneratedKeys();
             if (rs.next()) {
                 int id = rs.getInt(1);
-                System.out.println("Created an account with ID: " + id);
+                System.out.println("Account created successfully. Username: " + name + ", ID: " + id);
             }
         }
     }
@@ -244,11 +249,3 @@ public class Main {
         return (v == null || v.trim().isEmpty()) ? null : v.trim();
     }
 }
-
-
-//780112-1350
-//MB=V4cbAqPz4vqmQ
-//nytt resultset varje gång för varje test
-//behöver inte nytt objekt varje gång men = statement.executeQuery behövs
-//kan återanvända connection och statement
-//måste ställa ny fråga varje gång också

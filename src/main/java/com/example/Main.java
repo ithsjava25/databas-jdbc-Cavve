@@ -26,10 +26,8 @@ public class Main {
                             "as system properties (-Dkey=value) or environment variables.");
         }
 
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass);
-            Scanner sc = new Scanner(System.in);
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass);
+            Scanner sc = new Scanner(System.in)) {
             System.out.println("Username: ");
             String username = sc.nextLine();
 
@@ -51,12 +49,8 @@ public class Main {
                 }
             }
 
-            //nytt resultset varje gång för varje test
-            //behöver inte nytt objekt varje gång men = statement.executeQuery behövs
-            //kan återanvända connection och statement
-            //måste ställa ny fråga varje gång också
 
-            System.out.println("Login Sucessful");
+            System.out.println("Login Successful");
 
             int choice = -1;
             while (choice != 0) {
@@ -88,7 +82,7 @@ public class Main {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        }
+    }
 
 
     public void listSpacecrafts(Connection connection) throws SQLException {
@@ -163,7 +157,7 @@ public class Main {
         String name =  first_name.substring(0, Math.min(3, first_name.length())) +
                 last_name.substring(0, Math.min(3, last_name.length()));
 
-        String sql = "INSERT INTO account (name, first_name, last_name, ssn, password) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO account (name, first_name, last_name, ssn, password) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, name);
@@ -182,8 +176,10 @@ public class Main {
     }
 
     public void updateAccount(Connection connection, Scanner sc) throws SQLException {
+
         System.out.println("Enter user_id: ");
-        String user_id = sc.next();
+        int user_id = sc.nextInt();
+
         System.out.println("Enter new password: ");
         String password = sc.next();
 
@@ -191,7 +187,7 @@ public class Main {
         String sql = "UPDATE account SET password = ? WHERE user_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, password);
-            stmt.setString(2, user_id);
+            stmt.setInt(2, user_id);
 
             int rowsUpdated = stmt.executeUpdate();
 
